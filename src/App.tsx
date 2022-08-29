@@ -1,23 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { fetcher, mutator } from './fetcher'
 import { ServiceWorkerUpdateListener } from './ServiceWorkerUpdateListener'
 import './App.css'
 
 const App = () => {
-  const queryClient = useQueryClient()
-  const [value, setValue] = useState(0)
-  const { data } = useQuery<{ id: number, value: number}[]>(['numbers'], fetcher, { staleTime: Infinity })
-  const addNumber = useMutation(
-    (input: number) => mutator(input),
-    { onSuccess: () => { queryClient.invalidateQueries(['numbers'])} }
-  )
+  const [data, setData] = useState<{ value: number }[]>()
+  const [value, setValue] = useState('')
 
   const [updateWaiting, setUpdateWaiting] = useState(false)
   const [registration, setRegistration] = useState(null)
   const [swListener, setSwListener] = useState({})
 
   useEffect(() => {
+    const doFetch = async () => {
+      const data = await fetcher()
+      setData(data)
+    }
+
+    doFetch()
     if (process.env.NODE_ENV === "development") return
 
     let listener = new ServiceWorkerUpdateListener()
@@ -51,9 +51,12 @@ const App = () => {
     return () => listener.removeEventListener()
   }, [])
 
-  const handleAddNumber = () => {
-    addNumber.mutate(value)
-    setValue(0)
+  const handleAddNumber = async () => {
+    await mutator(parseInt(value))
+    setValue('')
+
+    const data = await fetcher()
+    setData(data)
   }
 
   const handleUpdate = () => {
@@ -75,7 +78,7 @@ const App = () => {
       </div>
       <div>
         <p>New number:</p>
-        <input type='number' value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
+        <input type='number' value={value} onChange={(e) => setValue(e.target.value)} />
         <button onClick={handleAddNumber}>Add</button>
       </div>
 

@@ -11,7 +11,7 @@
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
+import { registerRoute, Route } from 'workbox-routing';
 import { StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
@@ -79,10 +79,12 @@ self.addEventListener('message', (event) => {
 
 // Any other custom service worker logic can go here.
 registerRoute(
-  ({ url }) => {
-    return `https://${url.host}` === 'http://localhost:4000'
-  },
-  new NetworkFirst({
-    cacheName: 'API_CACHE'
-  })
+  new Route(
+    ({ url }) => {
+      return `http://${url.host}` === 'http://localhost:4000'
+    },
+    new NetworkFirst({
+      cacheName: 'API_CACHE'
+    })
+  )
 )
