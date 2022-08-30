@@ -48,7 +48,6 @@ const App = () => {
 
     let listener = new ServiceWorkerUpdateListener()
     setSwListener(listener)
-    console.log({ listener })
 
     // @ts-ignore
     listener.onupdateinstalling = (installingEvent) => {
@@ -111,9 +110,9 @@ const App = () => {
         updateWaiting && (
         <div>
           <p>
-            Update waiting!
+            Update waits!
           </p>
-          <button onClick={handleUpdate}>Update</button>
+          <button onClick={handleUpdate}>Click and Update</button>
         </div>
       )}
     </div>
