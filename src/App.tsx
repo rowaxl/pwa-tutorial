@@ -87,6 +87,12 @@ const App = () => {
     swListener.skipWaiting(registration.waiting);
   }
 
+  const handleRefresh = () => {
+    if (window) {
+      window.location.reload()
+    }
+  }
+
   return (
     <div className="App">
       <div>
@@ -115,6 +121,10 @@ const App = () => {
           <button onClick={handleUpdate}>Click and Update</button>
         </div>
       )}
+
+      <div>
+        <button onClick={handleRefresh}>Refresh</button>
+      </div>
     </div>
   )
 }
