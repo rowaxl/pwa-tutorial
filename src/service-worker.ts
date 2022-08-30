@@ -81,7 +81,7 @@ self.addEventListener('message', (event) => {
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 
 const backgroundSyncPlugin = new BackgroundSyncPlugin("PATCH-que", {
-  maxRetentionTime: 60 // minutes
+  maxRetentionTime: 60, // 60 minutes
 })
 
 registerRoute(
