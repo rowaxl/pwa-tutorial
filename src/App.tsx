@@ -1,10 +1,36 @@
 import { useEffect, useState } from 'react'
-import { fetcher, mutator } from './fetcher'
 import { ServiceWorkerUpdateListener } from './ServiceWorkerUpdateListener'
-import './App.css'
+import { createClient } from '@supabase/supabase-js'
+
+import './App.css';
+
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+
+const supabaseFetch = async () => {
+  const { data, error } = await supabase
+    .from('my_set')
+    .select('numbers')
+    .match({ id: 1 })
+  
+  console.log({data, error})
+  if (data) return data[0].numbers as number[]
+}
+
+const supabaseUpdate = async (numbers: number[]) => {
+  const { data, error } = await supabase
+    .from('my_set')
+    .update({numbers})
+    .match({ id: 1 })
+  
+  console.log({data, error})
+}
 
 const App = () => {
-  const [data, setData] = useState<{ value: number }[]>()
+  const [numbers, setNumbers] = useState<number[]>([])
   const [value, setValue] = useState('')
 
   const [updateWaiting, setUpdateWaiting] = useState(false)
@@ -13,8 +39,8 @@ const App = () => {
 
   useEffect(() => {
     const doFetch = async () => {
-      const data = await fetcher()
-      setData(data)
+      const data = await supabaseFetch()
+      data && setNumbers(data)
     }
 
     doFetch()
@@ -52,11 +78,9 @@ const App = () => {
   }, [])
 
   const handleAddNumber = async () => {
-    await mutator(parseInt(value))
+    setNumbers([...numbers, parseInt(value)])
+    await supabaseUpdate([...numbers, parseInt(value)])
     setValue('')
-
-    const data = await fetcher()
-    setData(data)
   }
 
   const handleUpdate = () => {
@@ -67,26 +91,30 @@ const App = () => {
   return (
     <div className="App">
       <div>
-        <p>Numbers: </p>
-        <span>
-          [
-          { data && 
-            data.map(d => d.value).join(', ')
-          }
-          ]
-        </span>
+        {
+          numbers.length > 0 && 
+          <>
+            <p>Numbers: </p>
+            <span>
+              [ { numbers.join(', ') } ]
+            </span>
+          </>
+        }
       </div>
       <div>
-        <p>New number:</p>
+        <p>Add New Number:</p>
         <input type='number' value={value} onChange={(e) => setValue(e.target.value)} />
         <button onClick={handleAddNumber}>Add</button>
       </div>
 
       {
         updateWaiting && (
-          <div>
-            Update waiting! <button onClick={handleUpdate}>Update</button>
-          </div>
+        <div>
+          <p>
+            Update waiting!
+          </p>
+          <button onClick={handleUpdate}>Update</button>
+        </div>
       )}
     </div>
   )
