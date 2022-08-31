@@ -9,7 +9,6 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-
 const supabaseFetch = async () => {
   const { data, error } = await supabase
     .from('my_set')
@@ -29,6 +28,15 @@ const supabaseUpdate = async (numbers: number[]) => {
   console.log({data, error})
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
 const App = () => {
   const [numbers, setNumbers] = useState<number[]>([])
   const [value, setValue] = useState('')
@@ -36,6 +44,9 @@ const App = () => {
   const [updateWaiting, setUpdateWaiting] = useState(false)
   const [registration, setRegistration] = useState(null)
   const [swListener, setSwListener] = useState({})
+  
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false)
+  const [deferredPrompt, setDeferredPrompts] = useState<BeforeInstallPromptEvent>()
 
   useEffect(() => {
     const doFetch = async () => {
@@ -76,6 +87,42 @@ const App = () => {
     return () => listener.removeEventListener()
   }, [])
 
+  useEffect(() => {
+    if (!('Notification' in window)) {
+      alert('Notificaiton is not supported in this window!')
+    }
+
+    Notification.requestPermission()
+  }, [])
+
+  useEffect(() => {
+    if (!window) return
+
+    const ready = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault()
+      // Stash the event so it can be triggered later.
+      setDeferredPrompts(e as BeforeInstallPromptEvent)
+      // Update UI notify the user they can install the PWA
+      setShowInstallPrompt(true)
+      // Optionally, send analytics event that PWA install promo was shown.
+      console.log(`'beforeinstallprompt' event was fired.`);
+    }
+
+    const installed = () => {
+      setShowInstallPrompt(false)
+    }
+
+    window.addEventListener('beforeinstallprompt', ready)
+
+    window.addEventListener('appinstalled', installed)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', ready)
+      window.removeEventListener('appinstalled', installed)
+    }
+  }, [])
+
   const handleAddNumber = async () => {
     setNumbers([...numbers, parseInt(value)])
     await supabaseUpdate([...numbers, parseInt(value)])
@@ -91,6 +138,28 @@ const App = () => {
     if (window) {
       window.location.reload()
     }
+  }
+
+  const handleNotification = () => {
+    if (!('Notification' in window)) {
+      alert('Notificaiton is not supported in this window!')
+    }
+
+    try {
+      new Notification('Non-persist notification')
+    } catch(err) {
+      console.error('Notification API Error: ', err)
+    }
+  }
+
+  const handlePWAInstall = async () => {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+
+    const { outcome } = await deferredPrompt.userChoice
+    console.log(`User response to the install prompt: ${outcome}`);
+
+    setDeferredPrompts(undefined)
   }
 
   return (
@@ -122,9 +191,26 @@ const App = () => {
         </div>
       )}
 
-      <div>
-        <button onClick={handleRefresh}>Refresh</button>
+      <div style={{ marginTop: 12 }}>
+        <button
+          onClick={handleRefresh}
+          style={{ marginRight: 12 }}
+        >
+          Refresh
+        </button>
+        <button 
+          onClick={handleNotification}
+        >
+          Local Notificaiton
+        </button>
       </div>
+
+      { showInstallPrompt && 
+        <div>
+          <p>You can try PWA!</p>
+          <button onClick={handlePWAInstall}>Install</button>
+        </div>
+      }
     </div>
   )
 }
