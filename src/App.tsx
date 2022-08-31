@@ -47,6 +47,7 @@ const App = () => {
   
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [deferredPrompt, setDeferredPrompts] = useState<BeforeInstallPromptEvent>()
+  const [notificationPermitted, setNotificationPermitted] = useState<NotificationPermission>()
 
   useEffect(() => {
     const doFetch = async () => {
@@ -90,9 +91,14 @@ const App = () => {
   useEffect(() => {
     if (!('Notification' in window)) {
       alert('Notificaiton is not supported in this window!')
+      return
     }
 
-    Notification.requestPermission()
+    const requestPermission = async () => {
+      const notificationPermission = await Notification.requestPermission()
+      setNotificationPermitted(notificationPermission)
+    }
+    requestPermission()
   }, [])
 
   useEffect(() => {
@@ -143,6 +149,7 @@ const App = () => {
   const handleNotification = () => {
     if (!('Notification' in window)) {
       alert('Notificaiton is not supported in this window!')
+      return
     }
 
     try {
@@ -198,11 +205,14 @@ const App = () => {
         >
           Refresh
         </button>
-        <button 
-          onClick={handleNotification}
-        >
-          Local Notificaiton
-        </button>
+        {
+          notificationPermitted === 'granted' &&
+          <button 
+            onClick={handleNotification}
+          >
+            Local Notificaiton
+          </button>
+        }
       </div>
 
       { showInstallPrompt && 
