@@ -89,10 +89,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    if (!('Notification' in window)) {
-      alert('Notificaiton is not supported in this window!')
-      return
-    }
+    if (!('Notification' in window)) return
 
     const requestPermission = async () => {
       const notificationPermission = await Notification.requestPermission()
