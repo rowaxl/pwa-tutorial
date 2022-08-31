@@ -45,7 +45,7 @@ const App = () => {
   const [registration, setRegistration] = useState(null)
   const [swListener, setSwListener] = useState({})
   
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false)
+  const [showInstallPrompt, setShowInstallPrompt] = useState(true)
   const [deferredPrompt, setDeferredPrompts] = useState<BeforeInstallPromptEvent>()
   const [notificationPermitted, setNotificationPermitted] = useState<NotificationPermission>()
 
@@ -190,7 +190,7 @@ const App = () => {
 
       {
         updateWaiting && (
-        <div>
+        <div style={{ marginTop: 12 }}>
           <p>
             Update waits!
           </p>
