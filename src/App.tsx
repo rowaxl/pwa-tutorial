@@ -20,7 +20,7 @@ const App = () => {
   const [registration, setRegistration] = useState(null)
   const [swListener, setSwListener] = useState({})
   
-  const [showInstallPrompt, setShowInstallPrompt] = useState(true)
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [deferredPrompt, setDeferredPrompts] = useState<BeforeInstallPromptEvent>()
   const [notificationPermitted, setNotificationPermitted] = useState<NotificationPermission>()
 
@@ -160,16 +160,6 @@ const App = () => {
         <button onClick={handleAddNumber}>Add</button>
       </div>
 
-      {
-        updateWaiting && (
-        <div style={{ marginTop: 12 }}>
-          <p>
-            Update waits!
-          </p>
-          <button onClick={handleUpdate}>Click and Update</button>
-        </div>
-      )}
-
       <div style={{ marginTop: 12 }}>
         <button
           onClick={handleRefresh}
@@ -193,6 +183,16 @@ const App = () => {
           <button onClick={handlePWAInstall}>Install</button>
         </div>
       }
+
+      {
+        updateWaiting && (
+        <div style={{ marginTop: 12 }}>
+          <p>
+            New Version Waits!
+          </p>
+          <button onClick={handleUpdate}>Update App</button>
+        </div>
+      )}
     </div>
   )
 }
