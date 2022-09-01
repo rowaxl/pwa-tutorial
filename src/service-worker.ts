@@ -78,7 +78,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 
 const backgroundSyncPlugin = new BackgroundSyncPlugin("PATCH-que", {
   maxRetentionTime: 60, // 60 minutes
@@ -87,7 +87,7 @@ const backgroundSyncPlugin = new BackgroundSyncPlugin("PATCH-que", {
 registerRoute(
   new Route(
     ({ url }) => {
-      return `https://${url.host}` === supabaseUrl
+      return `https://${url.host}` === API_URL
     },
     new NetworkOnly({
       plugins: [backgroundSyncPlugin]
@@ -99,7 +99,7 @@ registerRoute(
 registerRoute(
   new Route(
     ({ url }) => {
-      return `https://${url.host}` === supabaseUrl
+      return `https://${url.host}` === API_URL
     },
     new NetworkFirst({
       cacheName: "supabase-GET"
