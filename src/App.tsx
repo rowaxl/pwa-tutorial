@@ -1,32 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ServiceWorkerUpdateListener } from './ServiceWorkerUpdateListener'
-import { createClient } from '@supabase/supabase-js'
-
+import { fetchNumbers, updateNumbers } from './supabase'
 import './App.css';
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-const supabaseFetch = async () => {
-  const { data, error } = await supabase
-    .from('my_set')
-    .select('numbers')
-    .match({ id: 1 })
-  
-  console.log({data, error})
-  if (data) return data[0].numbers as number[]
-}
-
-const supabaseUpdate = async (numbers: number[]) => {
-  const { data, error } = await supabase
-    .from('my_set')
-    .update({numbers})
-    .match({ id: 1 })
-  
-  console.log({data, error})
-}
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -51,7 +26,7 @@ const App = () => {
 
   useEffect(() => {
     const doFetch = async () => {
-      const data = await supabaseFetch()
+      const data = await fetchNumbers()
       data && setNumbers(data)
     }
 
@@ -128,7 +103,7 @@ const App = () => {
 
   const handleAddNumber = async () => {
     setNumbers([...numbers, parseInt(value)])
-    await supabaseUpdate([...numbers, parseInt(value)])
+    await updateNumbers([...numbers, parseInt(value)])
     setValue('')
   }
 
