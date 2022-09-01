@@ -46,3 +46,9 @@ REACT_APP_API_KEY= <default: SupabaseのAPI anon Key>
   - ページ表示時、通知表示の許可が求められる
   - `許可する`を押下すると、画面に`Local Notification`ボタンが表示されること
   - `Local Notification`ボタンを押下すると、通知が表示されること
+- Update(Skip Waiting)
+  - フロントエンドのコード（文字列等）を修正し、`yarn serve`コマンドで実行する
+  - ページをリロードし、修正前のコードが表示されること
+  - `Update App`ボタンが表示されること
+  - `Update App`ボタン押下し、リロードが発生すること
+  - 修正後のページが表示されること
