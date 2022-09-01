@@ -36,7 +36,7 @@ REACT_APP_API_KEY= <default: SupabaseのAPI anon Key>
     - Applicationタブ → Service Workersで、Syncタブに`workbox-background-sync:PATCH-que`を入力し、Syncボタンを押下する
     - Networkタブで、PATCHリクエストが実行されること
   - モバイル
-    - WIFIとモバイルデータをオンにする
+    - Wi-Fiとモバイルデータをオンにする
     - `Refresh`ボタンでリロードを実行する
     - 上記手順で入力した数字が表示されること
 - インストールプロンプト(PC / Androidのみ)
